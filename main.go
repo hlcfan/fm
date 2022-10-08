@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
@@ -9,6 +8,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/clbanning/mxj/v2"
 )
 
 const (
@@ -32,8 +33,7 @@ func main() {
 	// -->
 	//  <isbn>23456</isbn> </book>`)
 
-	reader := bufio.NewReader(os.Stdin)
-	input, errRead := reader.ReadBytes('\n')
+	input, errRead := io.ReadAll(os.Stdin)
 
 	if errRead != nil {
 		fmt.Println("failed to read input")
@@ -46,7 +46,7 @@ func main() {
 	case "{":
 		out, err = formatJSON(input)
 	case "<":
-		out, err = formatXML(input)
+		out, err = formatXML2(input)
 	default:
 		err = errors.New("unsupported content")
 	}
@@ -98,4 +98,8 @@ tokenize:
 	}
 
 	return buf.Bytes(), nil
+}
+
+func formatXML2(input []byte) ([]byte, error) {
+	return mxj.BeautifyXml(input, defaultPrefix, defaultIndent)
 }
