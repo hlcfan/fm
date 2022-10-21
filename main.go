@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 
 	"github.com/clbanning/mxj/v2"
@@ -24,6 +25,11 @@ type xmlNode struct {
 	Text     string    `xml:",chardata"`
 }
 
+var (
+	errorLog *log.Logger
+	infoLog  *log.Logger
+)
+
 func main() {
 	// input := []byte(`{"data":[{"type":"articles","id":"1","attributes":{"title":"JSON:API paints my bikeshed!","body":"The shortest article. Ever."},"relationships":{"author":{"data":{"id":"42","type":"people"}}}}],"included":[{"type":"people","id":"42","attributes":{"name":"John"}}]}`)
 	// input := []byte("<1xml><test>blah</test></xml>")
@@ -33,10 +39,11 @@ func main() {
 	// -->
 	//  <isbn>23456</isbn> </book>`)
 
-	input, errRead := io.ReadAll(os.Stdin)
+	initializeLogging()
 
+	input, errRead := io.ReadAll(os.Stdin)
 	if errRead != nil {
-		fmt.Println("failed to read input")
+		errorLog.Fatal(errRead)
 	}
 
 	var out []byte
@@ -52,11 +59,11 @@ func main() {
 	}
 
 	if err != nil {
-		fmt.Println(err)
+		errorLog.Fatal(err)
 		return
 	}
 
-	fmt.Println(string(out))
+	infoLog.Println(string(out))
 }
 
 func formatJSON(input []byte) ([]byte, error) {
@@ -102,4 +109,9 @@ tokenize:
 
 func formatXML2(input []byte) ([]byte, error) {
 	return mxj.BeautifyXml(input, defaultPrefix, defaultIndent)
+}
+
+func initializeLogging() {
+	infoLog = log.New(os.Stdout, "", 0)
+	errorLog = log.New(os.Stderr, "error: ", 0)
 }
