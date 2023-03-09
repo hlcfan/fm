@@ -17,3 +17,18 @@ After:
 :%! fm
 ```
 
+### Usage
+
+```
+echo "{\"key\":\"value\"}" | fm
+{
+  "key": "value"
+}
+```
+
+### Note
+
+If on MacOS, you'll need to codesign the binary file.
+```
+codesign -s - fm
+```
