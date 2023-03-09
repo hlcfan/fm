@@ -50,7 +50,7 @@ func main() {
 	var err error
 
 	switch string(input[0:1]) {
-	case "{":
+	case "{", "[":
 		out, err = formatJSON(input)
 	case "<":
 		out, err = formatXML2(input)
