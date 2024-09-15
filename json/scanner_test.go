@@ -1,9 +1,9 @@
-package lexer_test
+package json_test
 
 import (
 	"testing"
 
-	"github.com/hlcfan/fm/lexer"
+	"github.com/hlcfan/fm/json"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -11,12 +11,12 @@ func TestScan(t *testing.T) {
 	tcs := []struct {
 		description string
 		input       string
-		tokens      []lexer.Token
+		tokens      []json.Token
 	}{
 		{
 			description: "It lexers json",
 			input:       `{"abccc":  3, "bbb": true, "cc":  false, "dd": [{"d1":1}, {"d2": null}]}`,
-			tokens: []lexer.Token{
+			tokens: []json.Token{
 				{Kind: 4, Value: "{"},
 				{Kind: 3, Value: "abccc"},
 				{Kind: 4, Value: ":"},
@@ -51,7 +51,7 @@ func TestScan(t *testing.T) {
 		{
 			description: "It lexers incomplete string value in json",
 			input:       `{"abccc":  "what-the`,
-			tokens: []lexer.Token{
+			tokens: []json.Token{
 				{Kind: 4, Value: "{"},
 				{Kind: 3, Value: "abccc"},
 				{Kind: 4, Value: ":"},
@@ -62,7 +62,7 @@ func TestScan(t *testing.T) {
 
 	for _, tc := range tcs {
 		t.Run(tc.description, func(t *testing.T) {
-			scanner := lexer.NewScanner(tc.input)
+			scanner := json.NewScanner(tc.input)
 			tokens := scanner.Scan()
 			assert.Equal(t, tc.tokens, tokens)
 		})

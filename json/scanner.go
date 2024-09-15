@@ -1,4 +1,4 @@
-package lexer
+package json
 
 import (
 	"fmt"
@@ -50,32 +50,32 @@ func (s *Scanner) Scan() []Token {
 			break
 		}
 		c := s.Source[s.Current]
-		fmt.Printf("===Char: %s\n", string(c))
+		// fmt.Printf("===Char: %s\n", string(c))
 
 		var token Token
 
 		switch c {
 		case '{':
 			tokens = append(tokens, Token{
-				Kind:  JsonSyntax,
+				Kind:  JsonBeginObject,
 				Value: "{",
 			})
 			s.Current++
 		case '}':
 			tokens = append(tokens, Token{
-				Kind:  JsonSyntax,
+				Kind:  JsonEndObject,
 				Value: "}",
 			})
 			s.Current++
 		case '[':
 			tokens = append(tokens, Token{
-				Kind:  JsonSyntax,
+				Kind:  JsonBeginArray,
 				Value: "[",
 			})
 			s.Current++
 		case ']':
 			tokens = append(tokens, Token{
-				Kind:  JsonSyntax,
+				Kind:  JsonEndArray,
 				Value: "]",
 			})
 			s.Current++
@@ -89,7 +89,7 @@ func (s *Scanner) Scan() []Token {
 			s.Current++
 			token = s.stringLiteral()
 			tokens = append(tokens, token)
-			fmt.Printf("===Token: %#v\n", token)
+			// fmt.Printf("===Token: %#v\n", token)
 			s.Current++
 			continue
 		case ',':
