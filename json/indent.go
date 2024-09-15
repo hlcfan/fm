@@ -13,9 +13,9 @@ func Indent(tokens []Token, indent string) {
 
 	for _, token := range tokens {
 		if token.Kind == JsonBeginObject {
-			buf.WriteString(strings.Repeat(indent, level))
+			currentLineIndent(buf, indent, level)
 			buf.WriteRune('{')
-			buf.WriteByte('\n')
+			writeNewline(buf)
 			level++
 			isJsonKey = true
 
@@ -24,8 +24,8 @@ func Indent(tokens []Token, indent string) {
 
 		if token.Kind == JsonEndObject {
 			level--
-			buf.WriteByte('\n')
-			buf.WriteString(strings.Repeat(indent, level))
+			writeNewline(buf)
+			currentLineIndent(buf, indent, level)
 			buf.WriteRune('}')
 
 			continue
@@ -33,7 +33,7 @@ func Indent(tokens []Token, indent string) {
 
 		if token.Kind == JsonBeginArray {
 			buf.WriteRune('[')
-			buf.WriteByte('\n')
+			writeNewline(buf)
 			level++
 			isJsonKey = true
 
@@ -42,8 +42,8 @@ func Indent(tokens []Token, indent string) {
 
 		if token.Kind == JsonEndArray {
 			level--
-			buf.WriteByte('\n')
-			buf.WriteString(strings.Repeat(indent, level))
+			writeNewline(buf)
+			currentLineIndent(buf, indent, level)
 			buf.WriteRune(']')
 
 			continue
@@ -51,7 +51,7 @@ func Indent(tokens []Token, indent string) {
 
 		if token.Kind == JsonSyntax && token.Value == "," {
 			buf.WriteString(token.Value)
-			buf.WriteByte('\n')
+			writeNewline(buf)
 			isJsonKey = true
 
 			continue
@@ -72,7 +72,6 @@ func Indent(tokens []Token, indent string) {
 
 		if token.Kind == JsonString {
 			if isJsonKey {
-				// buf.WriteString(strings.Repeat(indent, level))
 				currentLineIndent(buf, indent, level)
 				isJsonKey = false
 			}
