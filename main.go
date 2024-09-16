@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -11,6 +10,7 @@ import (
 	"os"
 
 	"github.com/clbanning/mxj/v2"
+	mjson "github.com/hlcfan/fm/json"
 )
 
 const (
@@ -40,7 +40,6 @@ func main() {
 	//  <isbn>23456</isbn> </book>`)
 
 	initializeLogging()
-
 	input, errRead := io.ReadAll(os.Stdin)
 	if errRead != nil {
 		errorLog.Fatal(errRead)
@@ -67,17 +66,13 @@ func main() {
 }
 
 func formatJSON(input []byte) ([]byte, error) {
-	var out bytes.Buffer
-	if !json.Valid((input)) {
-		return nil, errors.New("invalid json")
-	}
+	s := mjson.NewScanner(string(input))
 
-	err := json.Indent(&out, input, defaultPrefix, defaultIndent)
-	if err != nil {
-		return nil, fmt.Errorf("failed to indent json, error: %w", err)
-	}
+	tokens := s.Scan()
 
-	return out.Bytes(), nil
+	buf := mjson.Indent(tokens, "  ")
+
+	return buf.Bytes(), nil
 }
 
 func formatXML(input []byte) ([]byte, error) {
