@@ -2,14 +2,15 @@ package json
 
 import (
 	"bufio"
-	"os"
+	"bytes"
 	"strings"
 )
 
-func Indent(tokens []Token, indent string) {
+func Indent(tokens []Token, indent string) bytes.Buffer {
 	level := 0
 	isJsonKey := false
-	buf := bufio.NewWriter(os.Stdout)
+	var out bytes.Buffer
+	buf := bufio.NewWriter(&out)
 
 	for _, token := range tokens {
 		if token.Kind == JsonBeginObject {
@@ -75,9 +76,8 @@ func Indent(tokens []Token, indent string) {
 				currentLineIndent(buf, indent, level)
 				isJsonKey = false
 			}
-			buf.WriteRune('"')
+
 			buf.WriteString(token.Value)
-			buf.WriteRune('"')
 
 			continue
 		}
@@ -103,6 +103,8 @@ func Indent(tokens []Token, indent string) {
 
 	writeNewline(buf)
 	buf.Flush()
+
+	return out
 }
 
 func writeNewline(w *bufio.Writer) {
