@@ -107,7 +107,7 @@ func (s *Scanner) Scan() []Token {
 			token = s.nullLiteral()
 			tokens = append(tokens, token)
 			continue
-		case ' ':
+		case ' ', '\n':
 			s.Current++
 			continue
 		default:
@@ -131,9 +131,14 @@ func (s *Scanner) stringLiteral() Token {
 		s.Current++
 	}
 
+	endQuote := `"`
+	if s.Current >= len(s.Source) || (s.Current > len(s.Source) && s.Source[s.Current] != '"') {
+		endQuote = ""
+	}
+
 	return Token{
 		Kind:  JsonString,
-		Value: s.Source[curr:s.Current],
+		Value: `"` + s.Source[curr:s.Current] + endQuote,
 	}
 }
 
