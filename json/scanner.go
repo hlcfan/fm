@@ -42,13 +42,8 @@ func NewScanner(input string) *Scanner {
 
 func (s *Scanner) Scan() []Token {
 	tokens := []Token{}
-	i := 0
 
 	for s.Current < len(s.Source) {
-		i++
-		if i > 40 {
-			break
-		}
 		c := s.Source[s.Current]
 		// fmt.Printf("===Char: %s\n", string(c))
 
@@ -111,8 +106,8 @@ func (s *Scanner) Scan() []Token {
 			s.Current++
 			continue
 		default:
-			isDigit := unicode.IsDigit(rune(s.Source[s.Current]))
-			if isDigit {
+			isNumber := isBeginNumber(rune(s.Source[s.Current]))
+			if isNumber {
 				token = s.numberLiteral()
 				tokens = append(tokens, token)
 			} else {
@@ -144,7 +139,7 @@ func (s *Scanner) stringLiteral() Token {
 
 func (s *Scanner) numberLiteral() Token {
 	curr := s.Current
-	for unicode.IsDigit(rune(s.Source[s.Current])) {
+	for isNumber(rune(s.Source[s.Current])) {
 		s.Current++
 	}
 
@@ -191,4 +186,12 @@ func (s *Scanner) nullLiteral() Token {
 	}
 
 	return Token{}
+}
+
+func isBeginNumber(c rune) bool {
+	return unicode.IsDigit(c) || c == '-'
+}
+
+func isNumber(c rune) bool {
+	return isBeginNumber(c) || c == '.'
 }
