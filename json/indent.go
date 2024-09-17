@@ -101,7 +101,6 @@ func Indent(tokens []Token, indent string) bytes.Buffer {
 		}
 	}
 
-	writeNewline(buf)
 	buf.Flush()
 
 	return out
