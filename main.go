@@ -45,6 +45,8 @@ func main() {
 		errorLog.Fatal(errRead)
 	}
 
+	input = bytes.TrimRight(input, "\r\n")
+
 	var out []byte
 	var err error
 
@@ -69,7 +71,6 @@ func formatJSON(input []byte) ([]byte, error) {
 	s := mjson.NewScanner(string(input))
 
 	tokens := s.Scan()
-
 	buf := mjson.Indent(tokens, "  ")
 
 	return buf.Bytes(), nil

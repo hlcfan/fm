@@ -132,7 +132,7 @@ func (s *Scanner) stringLiteral() Token {
 	}
 
 	endQuote := `"`
-	if s.Current >= len(s.Source) || (s.Current > len(s.Source) && s.Source[s.Current] != '"') {
+	if s.Current >= len(s.Source) {
 		endQuote = ""
 	}
 
