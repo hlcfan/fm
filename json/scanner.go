@@ -139,7 +139,7 @@ func (s *Scanner) stringLiteral() Token {
 
 func (s *Scanner) numberLiteral() Token {
 	curr := s.Current
-	for isNumber(rune(s.Source[s.Current])) {
+	for s.Current < len(s.Source) && isNumber(rune(s.Source[s.Current])) {
 		s.Current++
 	}
 

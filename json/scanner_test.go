@@ -66,6 +66,16 @@ func TestScan(t *testing.T) {
 				{Kind: 3, Value: "\"what-the"},
 			},
 		},
+		{
+			description: "It lexers incomplete number value in json",
+			input:       `{"a":  -3.14159`,
+			tokens: []json.Token{
+				{Kind: 7, Value: "{"},
+				{Kind: 3, Value: `"a"`},
+				{Kind: 4, Value: ":"},
+				{Kind: 2, Value: "-3.14159"},
+			},
+		},
 	}
 
 	for _, tc := range tcs {
