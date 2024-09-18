@@ -13,8 +13,12 @@ func Indent(tokens []Token, indent string) bytes.Buffer {
 	buf := bufio.NewWriter(&out)
 
 	for _, token := range tokens {
-		if token.Kind == JsonBeginObject {
+		if isJsonKey {
 			currentLineIndent(buf, indent, level)
+			isJsonKey = false
+		}
+
+		if token.Kind == JsonBeginObject {
 			buf.WriteRune('{')
 			writeNewline(buf)
 			level++
@@ -72,11 +76,6 @@ func Indent(tokens []Token, indent string) bytes.Buffer {
 		}
 
 		if token.Kind == JsonString {
-			if isJsonKey {
-				currentLineIndent(buf, indent, level)
-				isJsonKey = false
-			}
-
 			buf.WriteString(token.Value)
 
 			continue
