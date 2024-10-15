@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"slices"
-	"strconv"
 	"strings"
 )
 
@@ -91,7 +90,7 @@ func Indent(tokens []Token, indent string) bytes.Buffer {
 				buf.WriteString(token.Value)
 			} else {
 				if isDataToken(token) {
-					newStr := strconv.Quote(token.Value)
+					newStr := token.Value
 					buf.WriteString(newStr)
 				}
 			}

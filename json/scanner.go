@@ -84,7 +84,7 @@ func (s *Scanner) Scan() []Token {
 			s.Current++
 			token = s.stringLiteral()
 			tokens = append(tokens, token)
-			fmt.Printf("===Token: %#v\n", token)
+			// fmt.Printf("===Token: %#v\n", token)
 			s.Current++
 			continue
 		case ',':
@@ -122,18 +122,11 @@ func (s *Scanner) Scan() []Token {
 
 func (s *Scanner) stringLiteral() Token {
 	curr := s.Current
-	// \a is invalid
-	// gotta maintain a whitelist of special chars
-	// iterate by rune
-	// for pos, char := range s.Source {
-	// 	fmt.Printf("character %c starts at byte position %d\n", char, pos)
-	// }
+	runes := []rune{'"'}
 
-	// fmt.Printf("===Chars: %s\n", (s.Source))
 	for s.Current < len(s.Source) &&
 		(s.Source[s.Current] != '"' ||
 			s.Source[(s.Current-1)] == '\\') {
-		fmt.Printf("===Char: %s\n", string(s.Source[s.Current]))
 		s.Current++
 	}
 
@@ -142,13 +135,12 @@ func (s *Scanner) stringLiteral() Token {
 		endQuote = 0
 	}
 
-	runes := []rune{'"'}
 	runes = append(runes, s.Source[curr:s.Current]...)
 	runes = append(runes, endQuote)
-	fmt.Printf("===String literal: %#v\n", string(runes))
+
 	return Token{
 		Kind:  JsonString,
-		Value: string(runes),
+		Value: (string(runes)),
 	}
 }
 
