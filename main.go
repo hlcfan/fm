@@ -68,7 +68,15 @@ func main() {
 }
 
 func formatJSON(input []byte) ([]byte, error) {
-	s := mjson.NewScanner(string(input))
+	// in := strconv.Quote(string(input))
+	in := string(input)
+
+	fmt.Printf("===Source0: %#v\n", in)
+	for pos, char := range in {
+		fmt.Printf("character %c starts at byte position %d\n", char, pos)
+	}
+
+	s := mjson.NewScanner(in)
 
 	tokens := s.Scan()
 	buf := mjson.Indent(tokens, "  ")

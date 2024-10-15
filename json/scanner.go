@@ -27,7 +27,7 @@ type Token struct {
 }
 
 type Scanner struct {
-	Source  string
+	Source  []rune
 	Start   int
 	Current int
 	End     int
@@ -35,17 +35,17 @@ type Scanner struct {
 
 func NewScanner(input string) *Scanner {
 	return &Scanner{
-		Source: input,
+		Source: []rune(input),
 		End:    len(input) - 1,
 	}
 }
 
 func (s *Scanner) Scan() []Token {
+	// fmt.Printf("===Source: %#v\n", s.Source)
 	tokens := []Token{}
 
 	for s.Current < len(s.Source) {
 		c := s.Source[s.Current]
-		// fmt.Printf("===Char: %s\n", string(c))
 
 		var token Token
 
@@ -84,7 +84,7 @@ func (s *Scanner) Scan() []Token {
 			s.Current++
 			token = s.stringLiteral()
 			tokens = append(tokens, token)
-			// fmt.Printf("===Token: %#v\n", token)
+			fmt.Printf("===Token: %#v\n", token)
 			s.Current++
 			continue
 		case ',':
@@ -122,18 +122,33 @@ func (s *Scanner) Scan() []Token {
 
 func (s *Scanner) stringLiteral() Token {
 	curr := s.Current
-	for s.Current < len(s.Source) && s.Source[s.Current] != '"' {
+	// \a is invalid
+	// gotta maintain a whitelist of special chars
+	// iterate by rune
+	// for pos, char := range s.Source {
+	// 	fmt.Printf("character %c starts at byte position %d\n", char, pos)
+	// }
+
+	// fmt.Printf("===Chars: %s\n", (s.Source))
+	for s.Current < len(s.Source) &&
+		(s.Source[s.Current] != '"' ||
+			s.Source[(s.Current-1)] == '\\') {
+		fmt.Printf("===Char: %s\n", string(s.Source[s.Current]))
 		s.Current++
 	}
 
-	endQuote := `"`
+	endQuote := '"'
 	if s.Current >= len(s.Source) {
-		endQuote = ""
+		endQuote = 0
 	}
 
+	runes := []rune{'"'}
+	runes = append(runes, s.Source[curr:s.Current]...)
+	runes = append(runes, endQuote)
+	fmt.Printf("===String literal: %#v\n", string(runes))
 	return Token{
 		Kind:  JsonString,
-		Value: `"` + s.Source[curr:s.Current] + endQuote,
+		Value: string(runes),
 	}
 }
 
@@ -145,7 +160,7 @@ func (s *Scanner) numberLiteral() Token {
 
 	return Token{
 		Kind:  JsonNumber,
-		Value: s.Source[curr:s.Current],
+		Value: string(s.Source[curr:s.Current]),
 	}
 }
 
@@ -154,19 +169,19 @@ func (s *Scanner) boolLiteral() Token {
 	t := s.Source[s.Current : s.Current+4]
 	f := s.Source[s.Current : s.Current+5]
 
-	if t == "true" {
+	if string(t) == "true" {
 		s.Current += 4
 		return Token{
 			Kind:  JsonNumber,
-			Value: s.Source[curr:s.Current],
+			Value: string(s.Source[curr:s.Current]),
 		}
 	}
 
-	if f == "false" {
+	if string(f) == "false" {
 		s.Current += 5
 		return Token{
 			Kind:  JsonBoolean,
-			Value: s.Source[curr:s.Current],
+			Value: string(s.Source[curr:s.Current]),
 		}
 	}
 
@@ -177,11 +192,11 @@ func (s *Scanner) nullLiteral() Token {
 	curr := s.Current
 	null := s.Source[s.Current : s.Current+4]
 
-	if null == "null" {
+	if string(null) == "null" {
 		s.Current += 4
 		return Token{
 			Kind:  JsonNull,
-			Value: s.Source[curr:s.Current],
+			Value: string(s.Source[curr:s.Current]),
 		}
 	}
 
