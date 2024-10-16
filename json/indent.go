@@ -12,15 +12,8 @@ func Indent(tokens []Token, indent string) bytes.Buffer {
 	isJsonKey := false
 	var out bytes.Buffer
 	buf := bufio.NewWriter(&out)
-	// fmt.Println("==Len", len(tokens))
 	for _, token := range tokens {
-		// json key and next token isn't end object'
-		// var nextToken Token
-		// if i+1 < len(tokens)-1 {
-		// 	nextToken = tokens[i+1]
-		// }
 
-		// fmt.Printf("Cur token: %#v, next token: %#v, jsonKey: %v, index: %v\n", token, nextToken, isJsonKey, i)
 		if token.Kind == JsonBeginObject {
 			if isJsonKey {
 				writeNewline(buf)
@@ -43,7 +36,6 @@ func Indent(tokens []Token, indent string) bytes.Buffer {
 		}
 
 		if token.Kind == JsonBeginArray {
-
 			buf.WriteRune('[')
 			level++
 			isJsonKey = true
@@ -55,7 +47,6 @@ func Indent(tokens []Token, indent string) bytes.Buffer {
 			level--
 			writeNewline(buf)
 			currentLineIndent(buf, indent, level)
-			// isJsonKey = true
 			buf.WriteRune(']')
 
 			continue
