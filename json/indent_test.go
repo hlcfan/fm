@@ -50,8 +50,8 @@ func TestIndent(t *testing.T) {
 }`,
 		},
 		{
-			description: "It indents complex object",
-			input:       `{"abccc":  3, "bbb": {}, "cc":  false, "dd": [{"d1":1.30}, {"d2": null, "d3": "1", "d4": -3.14159265358}], "foo":"bar","char":"a\a\"\n"}`,
+			description: "It indents complex object with special characters",
+			input:       `{"abccc":  3, "bbb": {}, "cc":  false, "dd": [{"d1":1.30}, {"d2": null, "d3": "1", "d4": -3.14159265358}], "foo":"bar","char":"a\a\"\\n\\r"}`,
 			output: `{
   "abccc": 3,
   "bbb": {
@@ -67,7 +67,8 @@ func TestIndent(t *testing.T) {
       "d4": -3.14159265358
     }
   ],
-  "foo": "bar"
+  "foo": "bar",
+  "char": "a\a\"\\n\\r"
 }`,
 		},
 	}
