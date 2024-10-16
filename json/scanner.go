@@ -5,6 +5,10 @@ import (
 	"unicode"
 )
 
+const (
+	doubleQuote = '"'
+)
+
 type TokenKind int
 
 const (
@@ -122,7 +126,7 @@ func (s *Scanner) Scan() []Token {
 
 func (s *Scanner) stringLiteral() Token {
 	curr := s.Current
-	runes := []rune{'"'}
+	runes := []rune{doubleQuote}
 
 	for s.Current < len(s.Source) &&
 		(s.Source[s.Current] != '"' ||
@@ -130,17 +134,15 @@ func (s *Scanner) stringLiteral() Token {
 		s.Current++
 	}
 
-	endQuote := '"'
-	if s.Current >= len(s.Source) {
-		endQuote = 0
-	}
-
 	runes = append(runes, s.Source[curr:s.Current]...)
-	runes = append(runes, endQuote)
+
+	if s.Current < len(s.Source) {
+		runes = append(runes, doubleQuote)
+	}
 
 	return Token{
 		Kind:  JsonString,
-		Value: (string(runes)),
+		Value: string(runes),
 	}
 }
 
