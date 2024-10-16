@@ -3,6 +3,7 @@ package json
 import (
 	"bufio"
 	"bytes"
+	"slices"
 	"strings"
 )
 
@@ -11,16 +12,14 @@ func Indent(tokens []Token, indent string) bytes.Buffer {
 	isJsonKey := false
 	var out bytes.Buffer
 	buf := bufio.NewWriter(&out)
-
 	for _, token := range tokens {
-		if isJsonKey {
-			currentLineIndent(buf, indent, level)
-			isJsonKey = false
-		}
 
 		if token.Kind == JsonBeginObject {
+			if isJsonKey {
+				writeNewline(buf)
+				currentLineIndent(buf, indent, level)
+			}
 			buf.WriteRune('{')
-			writeNewline(buf)
 			level++
 			isJsonKey = true
 
@@ -38,7 +37,6 @@ func Indent(tokens []Token, indent string) bytes.Buffer {
 
 		if token.Kind == JsonBeginArray {
 			buf.WriteRune('[')
-			writeNewline(buf)
 			level++
 			isJsonKey = true
 
@@ -56,7 +54,6 @@ func Indent(tokens []Token, indent string) bytes.Buffer {
 
 		if token.Kind == JsonSyntax && token.Value == "," {
 			buf.WriteString(token.Value)
-			writeNewline(buf)
 			isJsonKey = true
 
 			continue
@@ -65,23 +62,39 @@ func Indent(tokens []Token, indent string) bytes.Buffer {
 		if token.Kind == JsonSyntax && token.Value == ":" {
 			buf.WriteString(token.Value)
 			buf.WriteRune(' ')
+			isJsonKey = false
 
 			continue
 		}
 
 		if token.Kind == JsonSyntax {
 			buf.WriteString(token.Value)
+			isJsonKey = false
 
 			continue
 		}
 
 		if token.Kind == JsonString {
-			buf.WriteString(token.Value)
+			if isJsonKey {
+				writeNewline(buf)
+				currentLineIndent(buf, indent, level)
+				buf.WriteString(token.Value)
+			} else {
+				if isDataToken(token) {
+					newStr := token.Value
+					buf.WriteString(newStr)
+				}
+			}
 
 			continue
 		}
 
 		if token.Kind == JsonNumber {
+			if isJsonKey {
+				writeNewline(buf)
+				currentLineIndent(buf, indent, level)
+			}
+
 			buf.WriteString(token.Value)
 
 			continue
@@ -115,4 +128,13 @@ func currentLineIndent(w *bufio.Writer, indent string, level int) {
 
 func nextLineIndent(w *bufio.Writer, indent string, level int) {
 	w.WriteString(strings.Repeat(indent, level+1))
+}
+
+func isDataToken(token Token) bool {
+	return slices.Contains([]int{
+		int(JsonBoolean),
+		int(JsonNull),
+		int(JsonNumber),
+		int(JsonString),
+	}, int(token.Kind))
 }

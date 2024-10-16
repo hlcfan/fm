@@ -76,6 +76,28 @@ func TestScan(t *testing.T) {
 				{Kind: 2, Value: "-3.14159"},
 			},
 		},
+		{
+			description: "It lexers string with special character \\n",
+			input:       `{"a": "\n"}`,
+			tokens: []json.Token{
+				{Kind: 7, Value: "{"},
+				{Kind: 3, Value: `"a"`},
+				{Kind: 4, Value: ":"},
+				{Kind: 3, Value: `"\n"`},
+				{Kind: 8, Value: "}"},
+			},
+		},
+		{
+			description: "It lexers string with special character \\r",
+			input:       `{"a": "\r"}`,
+			tokens: []json.Token{
+				{Kind: 7, Value: "{"},
+				{Kind: 3, Value: `"a"`},
+				{Kind: 4, Value: ":"},
+				{Kind: 3, Value: `"\r"`},
+				{Kind: 8, Value: "}"},
+			},
+		},
 	}
 
 	for _, tc := range tcs {
