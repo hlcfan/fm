@@ -10,7 +10,7 @@ import (
 	"os"
 
 	"github.com/clbanning/mxj/v2"
-	mjson "github.com/hlcfan/fm/json"
+	"github.com/hlcfan/fm/json"
 )
 
 const (
@@ -67,13 +67,15 @@ func main() {
 	infoLog.Println(string(out))
 }
 
-func formatJSON(input []byte) ([]byte, error) {
-	s := mjson.NewScanner(string(input))
+func formatJSON(src []byte) ([]byte, error) {
+	prefix := ""
+	indent := " "
+	dst := make([]byte, 0, len(src)*2)
 
-	tokens := s.Scan()
-	buf := mjson.Indent(tokens, "  ")
+	scanner := json.NewScanner()
+	defer json.FreeScanner(scanner)
 
-	return buf.Bytes(), nil
+	return scanner.Format(src, dst, prefix, indent)
 }
 
 func formatXML(input []byte) ([]byte, error) {

@@ -17,14 +17,12 @@ func TestIndent(t *testing.T) {
 		{
 			description: "It indents empty object",
 			input:       `{}`,
-			output: `{
-}`,
+			output:      `{}`,
 		},
 		{
 			description: "It indents empty array",
 			input:       `[]`,
-			output: `[
-]`,
+			output:      `[]`,
 		},
 		{
 			description: "It indents array",
@@ -51,11 +49,10 @@ func TestIndent(t *testing.T) {
 		},
 		{
 			description: "It indents complex object with special characters",
-			input:       `{"abccc":  3, "bbb": {}, "cc":  false, "dd": [{"d1":1.30}, {"d2": null, "d3": "1", "d4": -3.14159265358}], "foo":"bar","char":"a\a\"\\n\\r"}`,
+			input:       `{"abccc":  3, "bbb": {}, "cc":  false, "dd": [{"d1":1.30}, {"d2": null, "d3": "1", "d4": -3.14159265358}], "foo":"bar","char":"aa\"\\n\\r"}`,
 			output: `{
   "abccc": 3,
-  "bbb": {
-  },
+  "bbb": {},
   "cc": false,
   "dd": [
     {
@@ -68,17 +65,23 @@ func TestIndent(t *testing.T) {
     }
   ],
   "foo": "bar",
-  "char": "a\a\"\\n\\r"
+  "char": "aa\"\\n\\r"
 }`,
 		},
 	}
 
 	for _, tc := range tcs {
 		defaultIndent := "  "
+		defaultPrefix := ""
 		t.Run(tc.description, func(t *testing.T) {
-			s := json.NewScanner(tc.input)
-			output := json.Indent(s.Scan(), defaultIndent)
-			assert.Equal(t, tc.output, output.String())
+			dst := make([]byte, 0, len(tc.input)*2)
+
+			scanner := json.NewScanner()
+			defer json.FreeScanner(scanner)
+
+			output, err := scanner.Format([]byte(tc.input), dst, defaultPrefix, defaultIndent)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.output, string(output))
 		})
 	}
 }
